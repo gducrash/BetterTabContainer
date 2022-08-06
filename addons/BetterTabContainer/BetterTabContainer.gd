@@ -14,13 +14,16 @@ onready var tabs_holder := MarginContainer.new()
 onready var children    := get_children()
 onready var sizex       := rect_size.x
 
-export(int) var current_tab = 0
+export(int)   var current_tab = 0
+export(float) var swipe_threshold = 64.0
 
 var scroll_velocity := Vector2.ZERO
 var scrolling       := false
 var target_scroll   := 0.0
 var current_scroll  := 0.0
 var prev_on_tab     := false
+var drag_init_pos   := Vector2.ZERO
+var swipe_threshold_reached := false
 
 func _ready() -> void:
 	# add a tab holder to the container and move all the children to it
@@ -47,12 +50,12 @@ func _ready() -> void:
 	update_target_scroll(true)
 	
 func _process(delta: float) -> void:
-	if (scrolling):
+	if scrolling:
 		current_scroll = scroll_horizontal
 	else:
 		# smoothly scroll to the current tab
-		if (prev_on_tab): current_scroll = target_scroll
-		else: current_scroll += (target_scroll - scroll_horizontal) * 8.0 * delta
+		if prev_on_tab: current_scroll = target_scroll
+		else:           current_scroll += (target_scroll - scroll_horizontal) * 8.0 * delta
 		scroll_horizontal = current_scroll
 		
 	# prevent actual mouse wheel scrolling
@@ -72,14 +75,31 @@ func resize() -> void:
 	update_target_scroll(true)
 	
 func _manage_input(event: InputEvent) -> void:
-	if (event is InputEventMouseButton):
+	if event is InputEventMouseButton:
 		# when the drag is stopped, end scrolling
-		if (!event.is_pressed()):
+		if not event.is_pressed():
 			end_scroll()
-	elif (event is InputEventScreenDrag):
+			
+	elif event is InputEventScreenDrag:
 		scroll_velocity = event.relative
-	elif (event is InputEventScreenTouch):
+		
+		# check for swipe threshold
+		if not swipe_threshold_reached:
+			#scroll_horizontal = target_scroll
+			var diff = abs(drag_init_pos.x - event.position.x)
+			if diff > swipe_threshold: 
+				swipe_threshold_reached = true
+			else:
+				scroll_horizontal = target_scroll
+		else:
+			# fake scroll, because for some reason, real scrolling stops
+			current_scroll -= event.relative.x
+			scroll_horizontal = current_scroll
+				
+	elif event is InputEventScreenTouch:
 		scrolling = true
+		drag_init_pos = event.position
+		swipe_threshold_reached = false
 		
 func end_scroll() -> void:
 	# calculate current tab, based on the horizontal scroll and the drag velocity 
@@ -93,11 +113,11 @@ func update_target_scroll(instant:bool=false) -> void:
 	# calculate horizontal scrolling required to fully switch to a single tab, with no overlaps
 	# if instant is true, also update the current scroll
 	target_scroll = current_tab * sizex
-	if (instant): 
+	if instant: 
 		current_scroll = target_scroll
 		scroll_horizontal = current_scroll
 	
 func switch_tab(tab:int=-1) -> void:
-	if (tab >= 0): current_tab = tab
+	if tab >= 0: current_tab = tab
 	update_target_scroll()
 	emit_signal("tab_switched", current_tab)
