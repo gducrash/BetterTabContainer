@@ -18,8 +18,8 @@ export(int) var current_tab = 0
 
 var scroll_velocity := Vector2.ZERO
 var scrolling       := false
-var target_scroll   := 0
-var current_scroll  := 0
+var target_scroll   := 0.0
+var current_scroll  := 0.0
 
 func _ready() -> void:
 	# add a tab holder to the container and move all the children to it
