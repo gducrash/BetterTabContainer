@@ -25,6 +25,7 @@ var current_scroll  := 0.0
 var prev_on_tab     := false
 var drag_init_pos   := Vector2.ZERO
 var swipe_threshold_reached := false
+var scrolled_with_wheel := false
 
 func _ready() -> void:
 	# add a tab holder to the container and move all the children to it
@@ -55,8 +56,8 @@ func _process(delta: float) -> void:
 		current_scroll = scroll_horizontal
 	else:
 		# smoothly scroll to the current tab
-		if prev_on_tab: current_scroll = target_scroll
-		else:           current_scroll += (target_scroll - scroll_horizontal) * 8.0 * delta
+		if prev_on_tab or scrolled_with_wheel: current_scroll = target_scroll
+		else: current_scroll += (target_scroll - scroll_horizontal) * 8.0 * delta
 		scroll_horizontal = current_scroll
 		
 	# prevent actual mouse wheel scrolling
@@ -80,6 +81,8 @@ func _manage_input(event: InputEvent) -> void:
 		# when the drag is stopped, end scrolling
 		if not event.is_pressed():
 			end_scroll()
+		elif event.button_index in [BUTTON_WHEEL_UP, BUTTON_WHEEL_DOWN, BUTTON_WHEEL_LEFT, BUTTON_WHEEL_RIGHT]:
+			scrolled_with_wheel = true
 			
 	elif event is InputEventScreenDrag:
 		scroll_velocity = event.relative
@@ -101,6 +104,7 @@ func _manage_input(event: InputEvent) -> void:
 		scrolling = true
 		drag_init_pos = event.position
 		swipe_threshold_reached = false
+		scrolled_with_wheel = false
 		
 func end_scroll() -> void:
 	# calculate current tab, based on the horizontal scroll and the drag velocity 
