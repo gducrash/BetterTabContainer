@@ -16,6 +16,7 @@ onready var sizex       := rect_size.x
 
 export(int)   var current_tab = 0
 export(float) var swipe_threshold = 64.0
+export(bool)  var smooth_switch = true
 
 var scroll_velocity := Vector2.ZERO
 var scrolling       := false
@@ -116,8 +117,10 @@ func update_target_scroll(instant:bool=false) -> void:
 	if instant: 
 		current_scroll = target_scroll
 		scroll_horizontal = current_scroll
+	else:
+		prev_on_tab = false
 	
 func switch_tab(tab:int=-1) -> void:
 	if tab >= 0: current_tab = tab
-	update_target_scroll()
+	update_target_scroll(!smooth_switch)
 	emit_signal("tab_switched", current_tab)
