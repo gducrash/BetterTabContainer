@@ -36,7 +36,6 @@ func _ready() -> void:
 	scroll_vertical_enabled = false
 	scroll_horizontal_enabled = true
 	tabs_holder.size_flags_vertical = 3
-	tabs_holder.rect_min_size.y = 1280
 	tabs_holder.mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	# connect required signals
