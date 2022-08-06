@@ -20,6 +20,7 @@ var scroll_velocity := Vector2.ZERO
 var scrolling       := false
 var target_scroll   := 0.0
 var current_scroll  := 0.0
+var prev_on_tab     := false
 
 func _ready() -> void:
 	# add a tab holder to the container and move all the children to it
@@ -51,8 +52,12 @@ func _process(delta: float) -> void:
 		current_scroll = scroll_horizontal
 	else:
 		# smoothly scroll to the current tab
-		current_scroll += (target_scroll - scroll_horizontal) * 8.0 * delta
+		if (prev_on_tab): current_scroll = target_scroll
+		else: current_scroll += (target_scroll - scroll_horizontal) * 8.0 * delta
 		scroll_horizontal = current_scroll
+		
+	# prevent actual mouse wheel scrolling
+	prev_on_tab = abs(current_scroll - target_scroll) < 1
 	
 func resize() -> void:
 	# handle window resizing
