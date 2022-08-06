@@ -15,8 +15,9 @@ onready var children    := get_children()
 onready var sizex       := rect_size.x
 
 export(int)   var current_tab = 0
-export(float) var swipe_threshold = 64.0
+export(float) var swipe_threshold = 128.0
 export(bool)  var smooth_switch = true
+export(float) var switch_power = 5.0
 
 var scroll_velocity := Vector2.ZERO
 var scrolling       := false
@@ -79,9 +80,9 @@ func resize() -> void:
 func _manage_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		# when the drag is stopped, end scrolling
-		if not event.is_pressed():
-			end_scroll()
-		elif event.button_index in [BUTTON_WHEEL_UP, BUTTON_WHEEL_DOWN, BUTTON_WHEEL_LEFT, BUTTON_WHEEL_RIGHT]:
+		#if not event.is_pressed():
+		#	end_scroll()
+		if event.button_index in [BUTTON_WHEEL_UP, BUTTON_WHEEL_DOWN, BUTTON_WHEEL_LEFT, BUTTON_WHEEL_RIGHT]:
 			scrolled_with_wheel = true
 			
 	elif event is InputEventScreenDrag:
@@ -101,15 +102,18 @@ func _manage_input(event: InputEvent) -> void:
 			scroll_horizontal = current_scroll
 				
 	elif event is InputEventScreenTouch:
-		scrolling = true
-		drag_init_pos = event.position
-		swipe_threshold_reached = false
-		scrolled_with_wheel = false
+		if event.is_pressed():
+			scrolling = true
+			drag_init_pos = event.position
+			swipe_threshold_reached = false
+			scrolled_with_wheel = false
+		else:
+			end_scroll()
 		
 func end_scroll() -> void:
 	# calculate current tab, based on the horizontal scroll and the drag velocity 
 	# and then switch to it
-	current_tab = int(round((scroll_horizontal - scroll_velocity.x) / sizex))
+	current_tab = int(clamp(round((scroll_horizontal - min(scroll_velocity.x * switch_power, sizex)) / sizex), 0, children.size()))
 	switch_tab()
 	scroll_velocity = Vector2.ZERO
 	scrolling = false
