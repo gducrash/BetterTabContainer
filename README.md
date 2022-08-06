@@ -5,7 +5,7 @@ This addon adds a container, that can have multiple tabs, which the user can cha
 1. Download the addon and place it into your project directory, either manually, or through the Asset Store
 2. Activate it in the Project Settings ("Plugins" tab)
 3. Add a `BetterTabContainer` node to a scene. It is recommended that it is either set to full rect or has a "Fill" horizontal size flag
-4. Add multiple nodes to it. Each child node counts as a separate tab, it can be any type of Control node. Please ignore the "ScrollContainer can only have one node" warning, I am activly trying to get rid of it
+4. Add multiple nodes to it. Each child node counts as a separate tab, it can be any type of Control node. Please ignore the "ScrollContainer can only have one node" warning, I am actively trying to get rid of it
 5. Done! 
 
 ## Customizing the Node
