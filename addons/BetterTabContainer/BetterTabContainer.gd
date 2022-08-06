@@ -61,7 +61,8 @@ func resize() -> void:
 	
 	var childi := 0
 	for child in children:
-		child.rect_position.x = get_viewport().get_visible_rect().size.x * childi
+		child.rect_size.x = sizex
+		child.rect_position.x = sizex * childi
 		childi += 1
 		
 	update_target_scroll(true)
