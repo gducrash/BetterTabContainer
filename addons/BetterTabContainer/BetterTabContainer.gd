@@ -80,8 +80,6 @@ func resize() -> void:
 func _manage_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		# when the drag is stopped, end scrolling
-		#if not event.is_pressed():
-		#	end_scroll()
 		if event.button_index in [BUTTON_WHEEL_UP, BUTTON_WHEEL_DOWN, BUTTON_WHEEL_LEFT, BUTTON_WHEEL_RIGHT]:
 			scrolled_with_wheel = true
 			
@@ -113,7 +111,7 @@ func _manage_input(event: InputEvent) -> void:
 func end_scroll() -> void:
 	# calculate current tab, based on the horizontal scroll and the drag velocity 
 	# and then switch to it
-	current_tab = int(clamp(round((scroll_horizontal - min(scroll_velocity.x * switch_power, sizex)) / sizex), 0, children.size()))
+	current_tab = int(clamp(round((scroll_horizontal - min(scroll_velocity.x * switch_power, sizex)) / sizex), 0, children.size()-1))
 	switch_tab()
 	scroll_velocity = Vector2.ZERO
 	scrolling = false
