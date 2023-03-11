@@ -10,14 +10,14 @@ extends ScrollContainer
 
 signal tab_switched(tab)
 
-onready var tabs_holder := MarginContainer.new()
-onready var children    := get_children()
-onready var sizex       := rect_size.x
+@onready var tabs_holder := MarginContainer.new()
+@onready var children    := get_children()
+@onready var sizex       := size.x
 
-export(int)   var current_tab = 0
-export(float) var swipe_threshold = 128.0
-export(bool)  var smooth_switch = true
-export(float) var switch_power = 5.0
+@export var current_tab:int = 0
+@export var swipe_threshold:float = 128.0
+@export var smooth_switch: = true
+@export var switch_power:float = 5.0
 
 var scroll_velocity := Vector2.ZERO
 var scrolling       := false
@@ -39,15 +39,15 @@ func _ready() -> void:
 	children = tabs_holder.get_children()
 		
 	# adjust all the properties of the containers
-	scroll_vertical_enabled = false
-	scroll_horizontal_enabled = true
+	scroll_vertical = false
+	scroll_horizontal = true
 	tabs_holder.size_flags_vertical = 3
 	tabs_holder.mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	# connect required signals
-	get_tree().get_root().connect("size_changed", self, "resize")
-	tabs_holder.connect("sort_children", self, "resize")
-	connect("gui_input", self, "_manage_input")
+	get_tree().get_root().size_changed.connect(resize)
+	tabs_holder.sort_children.connect(resize)
+	gui_input.connect(_manage_input)
 	resize()
 	switch_tab()
 	update_target_scroll(true)
@@ -66,13 +66,13 @@ func _process(delta: float) -> void:
 	
 func resize() -> void:
 	# handle window resizing
-	sizex = rect_size.x
-	tabs_holder.rect_min_size.x = sizex * children.size()	
+	sizex = size.x
+	tabs_holder.custom_minimum_size.x = sizex * children.size()
 	
 	var childi := 0
 	for child in children:
-		child.rect_size.x = sizex
-		child.rect_position.x = sizex * childi
+		child.size.x = sizex
+		child.position.x = sizex * childi
 		childi += 1
 		
 	update_target_scroll(true)
@@ -80,7 +80,7 @@ func resize() -> void:
 func _manage_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		# when the drag is stopped, end scrolling
-		if event.button_index in [BUTTON_WHEEL_UP, BUTTON_WHEEL_DOWN, BUTTON_WHEEL_LEFT, BUTTON_WHEEL_RIGHT]:
+		if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN, MOUSE_BUTTON_WHEEL_LEFT, MOUSE_BUTTON_WHEEL_RIGHT]:
 			scrolled_with_wheel = true
 			
 	elif event is InputEventScreenDrag:
